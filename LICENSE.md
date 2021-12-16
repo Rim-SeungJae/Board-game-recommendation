@@ -1,0 +1,1 @@
+Data used in this repository(/project/archive) is owned by BoardGameGeeks. Also, they are under the Creative Commons Attribution-NonCommercial-ShareAlike license, available at http://creativecommons.org/licenses/by-nc-sa/3.0/.
