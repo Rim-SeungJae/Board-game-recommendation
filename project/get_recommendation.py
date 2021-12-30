@@ -6,7 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def get_k_recommendation(board_game_title, k=10):
     bg_info = pd.read_csv('./archive/games_detailed_info.csv')
-    bg_info = bg_info[['primary', 'boardgamecategory']]
+    bg_info = bg_info[['primary', 'minplayers', 'maxplayers', 'boardgamecategory', 'boardgamemechanic']]
     bg_info = bg_info.dropna()
     similarity = np.load('./similarity.npy')
 
