@@ -5,6 +5,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 def get_k_recommendation(board_game_title, k=10):
+    ################################################
+    # input: gets title of a board game, k value
+    # output: returns k board games that are similar to the input board game
+    ################################################
     bg_info = pd.read_csv('./archive/games_detailed_info.csv')
     bg_info = bg_info[['primary', 'minplayers', 'maxplayers', 'boardgamecategory', 'boardgamemechanic']]
     bg_info = bg_info.dropna()
