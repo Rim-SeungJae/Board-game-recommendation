@@ -61,7 +61,6 @@ def save_corr_matrix():
         bg_rating_pivot = bg_rating_pivot.append(pivot_chunk, sort=False)
         # if bg_rating_pivot.empty:
         #     bg_rating_pivot = bg_rating_pivot.append(pivot_chunk, sort=False)
-        #     print('hi')
         # else:
         #     bg_rating_pivot = pd.merge(bg_rating_pivot, pivot_chunk, on='user', how='outer')
         bg_rating_pivot = bg_rating_pivot.groupby('user').sum().reset_index().set_index('user')
