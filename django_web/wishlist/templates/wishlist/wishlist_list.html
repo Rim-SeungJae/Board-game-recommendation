@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}wishlist_list.html{% endblock %}
+
+{% block content %}
+
+	<h1>Wishlist</h1>
+	<br>
+	
+	<ul>
+		{% for wishlist in object_list %}
+			<li><a href="{% url 'wishlist:detail' wishlist.id %}">{{ wishlist }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}

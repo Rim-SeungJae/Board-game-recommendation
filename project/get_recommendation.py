@@ -1,8 +1,5 @@
 import pandas as pd
 import numpy as np
-from ast import literal_eval
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
 def get_content_based_reccomendation(board_game_title, k=10):
     ################################################

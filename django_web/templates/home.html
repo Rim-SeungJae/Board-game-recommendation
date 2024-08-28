@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}home.html{% endblock %}
+
+{% block extra-style %}
+	<link href="{% static 'css/home.css' %}" rel="stylesheet">
+	<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+	<div class="home-image">
+	</div>
+
+	<hr style="margin: 10px 0;">
+
+	<div class="row">
+		<div class="col-sm-6">
+			<h3>이 다음엔 뭐하지?</h3>
+			<p>보드게임 카페에서 게임을 고르는데만 한참 고민하는 당신을 위한 웹사이트</p>
+		</div>
+	</div>
+{% endblock content %}

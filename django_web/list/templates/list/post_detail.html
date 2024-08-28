@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}post_detail.html{% endblock %}
+
+{% block content %}
+<!-- Bootstrap CSS 링크 추가 -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-5">
+    <!-- 보드게임 상세 정보 -->
+    <div class="row mb-4">
+        <div class="col-md-4 text-center">
+            <img src="{{ object.image }}" alt="{{ object.primary }}" class="img-fluid" style="max-height: 500px;">
+        </div>
+        <div class="col-md-8">
+            <h3>{{ object.primary }}</h3>
+            <div class="row mb-2">
+                <div class="col-md-4 border p-3">
+                    <h4>{{ object.minplayers }} ~ {{ object.maxplayers }}</h4>
+                    <p><small><u>적정인원</u></small></p>
+                </div>
+                <div class="col-md-4 border p-3">
+                    <h4>{{ object.playingtime }}분</h4>
+                    <p><small><u>플레이타임</u></small></p>
+                </div>
+                <div class="col-md-4 border p-3">
+                    <h4>{{ object.average }}</h4>
+                    <p><small><u>유저평점</u></small></p>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4 border p-3">
+                    <h4>{{ object.board_game_rank }}등</h4>
+                    <p><small><u>보드게임 랭킹</u></small></p>
+                </div>
+                <div class="col-md-4 border p-3">
+                    <h4>{{ object.boardgamecategory }}</h4>
+                    <p><small><u>카테고리</u></small></p>
+                </div>
+            </div>
+            <h4>보드게임 설명</h4>
+            <hr>
+            <div>{{ object.description }}</div>
+        </div>
+    </div>
+
+    <!-- 추천 보드게임 (내용 기반) -->
+    <h4 class="mt-5">다음 게임 추천</h4>
+    <hr>
+    <div class="container">
+        <div class="row g-3">
+            {% for game in content_recommendations %}
+            <div class="col-md-2">
+                <div class="card">
+                    <a href='{{ game.get_absolute_url }}'>
+                        <img src="{{ game.thumbnail }}" alt="{{ game.primary }}" class="card-img-top" style="max-height: 150px; object-fit: cover;">
+                    </a>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ game.primary }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>추천할 항목이 없습니다.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 추천 보드게임 (협업 필터링) -->
+    <h4 class="mt-5">이 보드게임을 좋아하는 사람들이 함께 본</h4>
+    <hr>
+    <div class="container">
+        <div class="row g-3">
+            {% for game in collaborative_recommendations %}
+            <div class="col-md-2">
+                <div class="card">
+                    <a href='{{ game.get_absolute_url }}'>
+                        <img src="{{ game.thumbnail }}" alt="{{ game.primary }}" class="card-img-top" style="max-height: 150px; object-fit: cover;">
+                    </a>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ game.primary }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>추천할 항목이 없습니다.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div id="disqus_thread"></div>
+
+{% endblock %}
+
+{% block extra-script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    var disqus_config = function () {
+        this.page.identifier = '{{ disqus_id }}';
+        this.page = '{{ disqus_url }}';
+        this.page.title = '{{ disqus_title }}';
+    };
+
+    (function () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://{{ disqus_short }}.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+{% endblock %}

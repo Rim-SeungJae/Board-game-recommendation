@@ -1,0 +1,14 @@
+.home-image{
+  background-image: url("../img/home.jpg");
+  background-size: cover;
+  position: fixed;
+  top: 0;
+  left: 0px;
+  opacity: 70%;
+
+  /* Preserve aspet ratio */
+  min-width: 100%;
+  min-height: 100%;
+  background-repeat: no-repeat;
+  display: none;
+}
