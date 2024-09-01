@@ -111,7 +111,7 @@ class BoardgameDV(DetailView):
         collaborative_recommendations = self.get_ncf_recommendations(self.object.index)
 
         context['content_recommendations'] = Boardgame_detail.objects.filter(index__in=content_recommendations)
-        context['collaborative_recommendations'] = Boardgame_detail.objects.filter(primary__in=collaborative_recommendations)
+        context['collaborative_recommendations'] = Boardgame_detail.objects.filter(index__in=collaborative_recommendations)
 
         return context
 
@@ -152,19 +152,22 @@ class BoardgameDV(DetailView):
 
         model_index = mapping_table[mapping_table.iloc[:,0] == db_index][1].iloc[0]
 
-        print(len(bg_titles))
+        print(model_index)
 
         with torch.no_grad():
             # 특정 게임 ID와 모든 다른 게임 ID 간의 유사도 계산
-            game_tensor = torch.tensor([model_index] * len(bg_titles), dtype=torch.long)
-            other_games_tensor = torch.tensor(range(len(bg_titles)), dtype=torch.long)
+            item_ids = torch.tensor([model_index] * 18984, dtype=torch.long)
+            user_ids = torch.tensor(list(range(351048)), dtype=torch.long)
 
-            inputs = torch.stack([game_tensor, other_games_tensor], dim=1)
+            inputs = torch.stack([user_ids, item_ids], dim=1)
             predictions = model(inputs).squeeze()
 
         # 특정 게임과 유사한 상위 게임 추천
         top_k_indices = torch.topk(predictions, top_k).indices.tolist()
-        recommended_games = [bg_titles[i] for i in top_k_indices]
+
+        print(top_k_indices)
+
+        recommended_games = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in top_k_indices]
 
         print(recommended_games)
 
