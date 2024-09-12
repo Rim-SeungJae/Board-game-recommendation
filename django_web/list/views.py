@@ -83,12 +83,14 @@ class BoardgameLV(ListView):
 # Load the npy files
 similarity_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'similarity.npy')
 corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'corr_matrix.npy')
+ncf_corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'ncf_corr_matrix.npy');
 bg_titles_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'bg_titles.npy')
 
 bg_titles = np.load(bg_titles_path)
 similarity = np.load(similarity_path)
 corr_matrix = np.load(corr_matrix_path)
 corr_matrix = corr_matrix.argsort()[:, ::-1]
+ncf_corr_matrix = np.load(ncf_corr_matrix_path)
 
 mapping_table_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'map.npy')
 mapping_table = np.load(mapping_table_path, allow_pickle=True)
@@ -107,11 +109,11 @@ class BoardgameDV(DetailView):
 
         # Get recommendations
         content_recommendations = self.get_content_based_recommendation()
-        collaborative_recommendations = self.get_colaborative_filtering_recommendation(self.object.primary)
-        #collaborative_recommendations = self.get_ncf_recommendations(self.object.index)
+        #collaborative_recommendations = self.get_colaborative_filtering_recommendation(self.object.primary)
+        collaborative_recommendations = self.get_ncf_recommendations(self.object.index)
 
         context['content_recommendations'] = Boardgame_detail.objects.filter(index__in=content_recommendations)
-        context['collaborative_recommendations'] = Boardgame_detail.objects.filter(primary__in=collaborative_recommendations)
+        context['collaborative_recommendations'] = Boardgame_detail.objects.filter(index__in=collaborative_recommendations)
 
         return context
 
@@ -146,31 +148,23 @@ class BoardgameDV(DetailView):
 
         return recommendation
 
-    def get_ncf_recommendations(self, db_index, top_k=10):
+    def get_ncf_recommendations(self, db_index, k=10):
         model.eval()
 
-        model_index = mapping_table[mapping_table.iloc[:,0] == db_index][1].iloc[0]
+        target_idx = mapping_table[mapping_table.iloc[:,0] == db_index][1].iloc[0]
 
-        print(model_index)
+        print(target_idx)
 
-        with torch.no_grad():
-            # 특정 게임 ID와 모든 다른 게임 ID 간의 유사도 계산
-            item_ids = torch.tensor([model_index] * 18984, dtype=torch.long)
-            user_ids = torch.tensor(list(range(351048)), dtype=torch.long)
+        similar_idx = np.argsort(-ncf_corr_matrix[target_idx])[:k+1]
+        similar_idx = similar_idx[similar_idx != target_idx]
 
-            inputs = torch.stack([user_ids, item_ids], dim=1)
-            predictions = model(inputs).squeeze()
+        print(similar_idx)
 
-        # 특정 게임과 유사한 상위 게임 추천
-        top_k_indices = torch.topk(predictions, top_k).indices.tolist()
+        recommendation = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in similar_idx]
 
-        print(top_k_indices)
+        print(recommendation)
 
-        recommended_games = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in top_k_indices]
-
-        print(recommended_games)
-
-        return recommended_games
+        return recommendation
 
 
 def boardgame_search(request):
