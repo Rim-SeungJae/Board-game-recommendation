@@ -153,16 +153,11 @@ class BoardgameDV(DetailView):
 
         target_idx = mapping_table[mapping_table.iloc[:,0] == db_index][1].iloc[0]
 
-        print(target_idx)
-
         similar_idx = np.argsort(-ncf_corr_matrix[target_idx])[:k+1]
+        print(similar_idx)
         similar_idx = similar_idx[similar_idx != target_idx]
 
-        print(similar_idx)
-
         recommendation = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in similar_idx]
-
-        print(recommendation)
 
         return recommendation
 
