@@ -135,6 +135,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR,'static')]
 MEDIA_URL='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 DISQUS_SHORTNAME = 'trade-3'
 DISQUS_MY_DOMAIN='http://192.168.56.101:8000'
 
