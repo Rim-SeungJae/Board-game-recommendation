@@ -25,6 +25,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+'''
 class NCF(nn.Module):
     def __init__(self, num_users, num_items, embedding_dim, hidden_layers):
         super(NCF, self).__init__()
@@ -73,6 +74,7 @@ class NCF(nn.Module):
 model = NCF(351048,18984,20,[64,32])
 model_load_path = os.path.join(settings.MEDIA_ROOT, 'models', 'ncf_model.pth')
 model.load_state_dict(torch.load(model_load_path,map_location=torch.device('cpu')))
+'''
 
 class BoardgameLV(ListView):
     model=Boardgame
@@ -82,14 +84,14 @@ class BoardgameLV(ListView):
 
 # Load the npy files
 similarity_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'similarity.npy')
-corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'corr_matrix.npy')
+# corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'corr_matrix.npy')
 ncf_corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'ncf_corr_matrix.npy');
 bg_titles_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'bg_titles.npy')
 
 bg_titles = np.load(bg_titles_path)
 similarity = np.load(similarity_path)
-corr_matrix = np.load(corr_matrix_path)
-corr_matrix = corr_matrix.argsort()[:, ::-1]
+# corr_matrix = np.load(corr_matrix_path)
+# corr_matrix = corr_matrix.argsort()[:, ::-1]
 ncf_corr_matrix = np.load(ncf_corr_matrix_path)
 
 mapping_table_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'map.npy')
@@ -149,7 +151,7 @@ class BoardgameDV(DetailView):
         return recommendation
 
     def get_ncf_recommendations(self, db_index, k=10):
-        model.eval()
+        # model.eval()
 
         target_idx = mapping_table[mapping_table.iloc[:,0] == db_index][1].iloc[0]
 
