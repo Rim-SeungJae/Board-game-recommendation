@@ -25,7 +25,8 @@ SECRET_KEY = '7u2rfty5ce80q(e-9_agxob&j%efq%^6eq%&ya6^0gt+*-=prc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.56.101','localhost','127.0.0.1','dipreez.pythonanywhere.com']
+# ALLOWED_HOSTS = ['192.168.56.101','localhost','127.0.0.1','dipreez.pythonanywhere.com']
+ALLOWED_HOSTS = ['dipreez.pythonanywhere.com']
 
 
 # Application definition
