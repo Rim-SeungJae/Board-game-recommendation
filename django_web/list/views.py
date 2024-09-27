@@ -92,7 +92,7 @@ bg_titles = np.load(bg_titles_path)
 similarity = np.load(similarity_path)
 # corr_matrix = np.load(corr_matrix_path)
 # corr_matrix = corr_matrix.argsort()[:, ::-1]
-ncf_corr_matrix = np.load(ncf_corr_matrix_path)
+ncf_corr_matrix = np.load(ncf_corr_matrix_path, allow_pickle=True)
 
 mapping_table_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'map.npy')
 mapping_table = np.load(mapping_table_path, allow_pickle=True)
