@@ -25,7 +25,7 @@ SECRET_KEY = '7u2rfty5ce80q(e-9_agxob&j%efq%^6eq%&ya6^0gt+*-=prc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.56.101','localhost','127.0.0.1']
+ALLOWED_HOSTS = ['192.168.56.101','localhost','127.0.0.1','dipreez.pythonanywhere.com']
 
 
 # Application definition
@@ -145,11 +145,10 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR,'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DISQUS_SHORTNAME = 'trade-3'
 DISQUS_MY_DOMAIN='http://192.168.56.101:8000'
