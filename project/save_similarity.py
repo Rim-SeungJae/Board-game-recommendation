@@ -198,8 +198,41 @@ def save_ncf_corr_matrix():
     np.save('ncf_corr_matrix.npy', corr_matrix)
 
 
+def save_ncf_top_k_similarity(k=10, save_path="ncf_top_k_similarity.npy"):
+    model = NCF(num_users=351048, num_items=18984, embedding_dim=20, hidden_layers=[64, 32])
+    model.load_state_dict(torch.load('C:/Users/dipreez/Desktop/졸작/Board-game-recommendation/project/ncf_model.pth'))
+    model.eval()
+
+    gmf_item_embedding = model.item_embedding_gmf.weight.detach().cpu().numpy()
+    mlp_item_embedding = model.item_embedding_mlp.weight.detach().cpu().numpy()
+
+    combined_item_embedding = np.concatenate((gmf_item_embedding, mlp_item_embedding), axis=1)
+
+    num_items = combined_item_embedding.shape[0]
+    top_k_similarities = {}
+
+    for i in range(num_items):
+        # i번째 아이템의 임베딩 벡터
+        target_vector = combined_item_embedding[i]
+
+        # 모든 아이템과의 코사인 유사도 계산
+        similarity_scores = np.dot(combined_item_embedding, target_vector) / (
+                np.linalg.norm(combined_item_embedding, axis=1) * np.linalg.norm(target_vector) + 1e-9
+        )
+
+        # 자신을 제외한 상위 k개의 유사 아이템 선택
+        top_k_indices = np.argsort(-similarity_scores)[1:k+1]
+        top_k_values = similarity_scores[top_k_indices]
+
+        # 딕셔너리에 인덱스와 해당 유사도를 저장
+        top_k_similarities[i] = list(zip(top_k_indices, top_k_values))
+
+    np.save(save_path, top_k_similarities)
+    print(f"Top-{k} NCF similarity matrix saved to {save_path}")
+
+
 
 if __name__ == '__main__':
     #save_content_based_similarity()
     #save_corr_matrix()
-    save_ncf_corr_matrix()
+    save_ncf_top_k_similarity(10, "ncf_top_k_similarity.npy")

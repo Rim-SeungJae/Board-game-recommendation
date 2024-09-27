@@ -85,7 +85,7 @@ class BoardgameLV(ListView):
 # Load the npy files
 similarity_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'similarity.npy')
 # corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'corr_matrix.npy')
-ncf_corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'ncf_corr_matrix.npy');
+ncf_corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'ncf_top_k_similarity.npy');
 bg_titles_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'bg_titles.npy')
 
 bg_titles = np.load(bg_titles_path)
@@ -155,11 +155,11 @@ class BoardgameDV(DetailView):
 
         target_idx = mapping_table[mapping_table.iloc[:,0] == db_index][1].iloc[0]
 
-        similar_idx = np.argsort(-ncf_corr_matrix[target_idx])[:k+1]
-        print(similar_idx)
-        similar_idx = similar_idx[similar_idx != target_idx]
+        similar_idx = ncf_corr_matrix[target_idx]
+        top_k_indices = [item[0] for item in similar_idx[:k]]
+        print(top_k_indices)
 
-        recommendation = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in similar_idx]
+        recommendation = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in top_k_indices]
 
         return recommendation
 
