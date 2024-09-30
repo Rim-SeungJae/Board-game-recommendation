@@ -25,6 +25,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import random
+
 '''
 class NCF(nn.Module):
     def __init__(self, num_users, num_items, embedding_dim, hidden_layers):
@@ -84,7 +86,7 @@ class BoardgameLV(ListView):
 
 # Load the npy files
 similarity_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'similarity.npy')
-# corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'corr_matrix.npy')
+# corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'top_k_corr_matrix.npy')
 ncf_corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'ncf_top_k_similarity.npy');
 bg_titles_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'bg_titles.npy')
 
@@ -113,9 +115,10 @@ class BoardgameDV(DetailView):
         content_recommendations = self.get_content_based_recommendation()
         #collaborative_recommendations = self.get_colaborative_filtering_recommendation(self.object.primary)
         collaborative_recommendations = self.get_ncf_recommendations(self.object.index)
+        random_recommendation = self.get_random_recommendation()
 
         context['content_recommendations'] = Boardgame_detail.objects.filter(index__in=content_recommendations)
-        context['collaborative_recommendations'] = Boardgame_detail.objects.filter(index__in=collaborative_recommendations)
+        context['collaborative_recommendations'] = Boardgame_detail.objects.filter(index__in=random_recommendation)
 
         return context
 
@@ -141,12 +144,10 @@ class BoardgameDV(DetailView):
         except ValueError:
             return []
 
-        # Find similar games
-
-        similar_idx = corr_matrix[target_idx, :k+1].reshape(-1)
-        similar_idx = similar_idx[similar_idx != target_idx]
-
-        recommendation = list(bg_titles[similar_idx])
+        # Retrieve the indices of the top-k similar games
+        similar_idx = np.nonzero(top_k_corr_matrix[target_idx])[0]
+        top_k_similar_idx = similar_idx[:k]
+        recommendation = list(bg_titles[top_k_similar_idx])
 
         return recommendation
 
@@ -162,6 +163,12 @@ class BoardgameDV(DetailView):
         recommendation = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in top_k_indices]
 
         return recommendation
+
+    def get_random_recommendation(self, k=10):
+        total_games = Boardgame_detail.objects.all().values_list('index', flat=True)
+        random_indices = random.sample(list(total_games), k)
+
+        return random_indices
 
 
 def boardgame_search(request):

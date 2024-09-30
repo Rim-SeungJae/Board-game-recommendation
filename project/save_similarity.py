@@ -180,6 +180,28 @@ def save_corr_matrix():
     np.save('corr_matrix.npy', corr_matrix)
     np.save('bg_titles.npy', title_array)
 
+def save_top_k_from_existing_corr_matrix(npy_file_path, k=10, output_file_path='top_k_corr_matrix.npy'):
+    ################################################
+    # input:
+    # npy_file_path: path to existing correlation matrix npy file
+    # k: number of top similar items to retain for each item
+    # output: saves top-k correlation matrix to a new npy file
+    ################################################
+
+    # Load existing correlation matrix
+    corr_matrix = np.load(npy_file_path)
+
+    # Initialize matrix to store top-k similarities
+    top_k_corr_matrix = np.zeros_like(corr_matrix)
+
+    # Retain only top-k similarities for each item
+    for i in range(corr_matrix.shape[0]):
+        top_k_indices = np.argsort(-corr_matrix[i])[1:k+1]  # Retain top k+1 (including self)
+        top_k_corr_matrix[i, top_k_indices] = corr_matrix[i, top_k_indices]
+
+    # Save the modified matrix
+    np.save(output_file_path, top_k_corr_matrix)
+
 # NCF 모델의 GMF와 MLP 아이템 임베딩을 결합하여 유사도 행렬 계산
 def save_ncf_corr_matrix():
 
@@ -235,4 +257,4 @@ def save_ncf_top_k_similarity(k=10, save_path="ncf_top_k_similarity.npy"):
 if __name__ == '__main__':
     #save_content_based_similarity()
     #save_corr_matrix()
-    save_ncf_top_k_similarity(10, "ncf_top_k_similarity.npy")
+    save_top_k_from_existing_corr_matrix('C:/Users/dipreez/Desktop/졸작/Board-game-recommendation/project/corr_matrix.npy', k=10)
