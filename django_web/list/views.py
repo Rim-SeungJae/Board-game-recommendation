@@ -86,13 +86,13 @@ class BoardgameLV(ListView):
 
 # Load the npy files
 similarity_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'similarity.npy')
-# corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'top_k_corr_matrix.npy')
+corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'top_k_corr_matrix.npy')
 ncf_corr_matrix_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'ncf_top_k_similarity.npy');
 bg_titles_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'bg_titles.npy')
 
 bg_titles = np.load(bg_titles_path)
 similarity = np.load(similarity_path)
-# corr_matrix = np.load(corr_matrix_path)
+corr_matrix = np.load(corr_matrix_path)
 # corr_matrix = corr_matrix.argsort()[:, ::-1]
 ncf_corr_matrix = np.load(ncf_corr_matrix_path, allow_pickle=True).item()
 
