@@ -113,12 +113,12 @@ class BoardgameDV(DetailView):
 
         # Get recommendations
         content_recommendations = self.get_content_based_recommendation()
-        collaborative_recommendations = self.get_colaborative_filtering_recommendation(self.object.primary)
-        #collaborative_recommendations = self.get_ncf_recommendations(self.object.index)
+        #collaborative_recommendations = self.get_colaborative_filtering_recommendation(self.object.primary)
+        collaborative_recommendations = self.get_ncf_recommendations(self.object.index)
         random_recommendation = self.get_random_recommendation()
 
         context['content_recommendations'] = Boardgame_detail.objects.filter(index__in=content_recommendations)
-        context['collaborative_recommendations'] = Boardgame_detail.objects.filter(primary__in=collaborative_recommendations)
+        context['collaborative_recommendations'] = Boardgame_detail.objects.filter(index__in=collaborative_recommendations)
 
         return context
 
