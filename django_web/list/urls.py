@@ -30,4 +30,7 @@ urlpatterns = [
     path('post/<int:pk>/', views.BoardgameDV.as_view(),name='post_detail'),
 
     path('search/',views.boardgame_search,name='boardgame_search'),
+
+    path('rate/<int:boardgame_id>/', views.rate_boardgame, name='rate_boardgame'),
+
 ]

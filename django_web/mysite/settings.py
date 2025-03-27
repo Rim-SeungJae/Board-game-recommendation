@@ -25,8 +25,8 @@ SECRET_KEY = '7u2rfty5ce80q(e-9_agxob&j%efq%^6eq%&ya6^0gt+*-=prc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['192.168.56.101','localhost','127.0.0.1','dipreez.pythonanywhere.com']
-ALLOWED_HOSTS = ['dipreez.pythonanywhere.com']
+ALLOWED_HOSTS = ['192.168.56.101','localhost','127.0.0.1','dipreez.pythonanywhere.com']
+# ALLOWED_HOSTS = ['dipreez.pythonanywhere.com']
 
 
 # Application definition
@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-'''
+
 #local database
 DATABASES = {
     'default': {
@@ -89,8 +89,8 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-'''
 
+'''
 # pythonanywhere database
 DATABASES = {
     'default': {
@@ -102,7 +102,7 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
+'''
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -154,4 +154,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 DISQUS_SHORTNAME = 'trade-3'
 DISQUS_MY_DOMAIN='http://192.168.56.101:8000'
 
+LOGIN_URL = '/accounts/login'
 LOGIN_REDIRECT_URL ='/'
+LOGOUT_REDIRECT_URL = '/'

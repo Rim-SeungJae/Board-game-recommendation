@@ -2,6 +2,33 @@
 
 {% block title %}post_detail.html{% endblock %}
 
+{% block extra-style %}
+<style>
+  .star-rating {
+    direction: rtl;
+    display: inline-flex;
+    font-size: 2rem;
+  }
+  .star-rating input[type="radio"] {
+    display: none;
+  }
+  .star-rating label {
+    color: #ddd;
+    cursor: pointer;
+  }
+  .star-rating input[type="radio"]:checked ~ label {
+    color: gold;
+  }
+  .star-rating label:hover,
+  .star-rating label:hover ~ label {
+    color: gold;
+  }
+</style>
+
+{% endblock %}
+
+
+
 {% block content %}
 <!-- Bootstrap CSS 링크 추가 -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
@@ -43,6 +70,24 @@
             <div>{{ object.description }}</div>
         </div>
     </div>
+
+    {% if user.is_authenticated %}
+      <form action="{% url 'list:rate_boardgame' object.index %}" method="post">
+        {% csrf_token %}
+        <div class="star-rating">
+          {% for i in rating_choices %}
+            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}"
+              {% if user_rating == i %}checked{% endif %}>
+            <label for="star{{ i }}" title="{{ i }}점">★</label>
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-sm btn-primary mt-2">별점 제출</button>
+      </form>
+    {% else %}
+      <p>별점을 남기려면 <a href="{% url 'login' %}">로그인</a>하세요.</p>
+    {% endif %}
+
+
 
     <!-- 추천 보드게임 (내용 기반) -->
     <h4 class="mt-5">다음 게임 추천</h4>
@@ -87,6 +132,28 @@
             {% endfor %}
         </div>
     </div>
+
+    <h4 class="mt-5">회원님을 위한 추천 보드게임</h4>
+    <hr>
+    <div class="container">
+      <div class="row g-3">
+        {% for game in personalized_recommendations %}
+          <div class="col-md-2">
+            <div class="card">
+              <a href='{{ game.get_absolute_url }}'>
+                <img src="{{ game.thumbnail }}" alt="{{ game.primary }}" class="card-img-top" style="max-height: 150px; object-fit: cover;">
+              </a>
+              <div class="card-body text-center">
+                <h5 class="card-title">{{ game.primary }}</h5>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p>평가한 보드게임이 없어 아직 추천할 수 없습니다.</p>
+        {% endfor %}
+      </div>
+    </div>
+
 </div>
 
 <br>

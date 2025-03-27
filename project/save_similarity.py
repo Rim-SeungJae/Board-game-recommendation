@@ -255,6 +255,6 @@ def save_ncf_top_k_similarity(k=10, save_path="ncf_top_k_similarity.npy"):
 
 
 if __name__ == '__main__':
-    #save_content_based_similarity()
+    save_content_based_similarity()
     #save_corr_matrix()
-    save_top_k_from_existing_corr_matrix('C:/Users/dipreez/Desktop/졸작/Board-game-recommendation/project/corr_matrix.npy', k=10)
+    # save_top_k_from_existing_corr_matrix('C:/Users/dipreez/Desktop/졸작/Board-game-recommendation/project/corr_matrix.npy', k=10)

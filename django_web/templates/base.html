@@ -33,6 +33,23 @@
           <a class="nav-link" href="{% url 'list:boardgame_search' %}">검색</a>
         </li>
       </ul>
+
+			<ul class="navbar-nav ml-auto">
+				{% if user.is_authenticated %}
+					<li class="nav-item">
+						<span class="nav-link">안녕하세요, {{ user.username }}님</span>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'logout' %}">로그아웃</a>
+					</li>
+				{% else %}
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'login' %}">로그인</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'register' %}">회원가입</a>
+					</li>
+				{% endif %}
     </div>
   </div>
 </nav>

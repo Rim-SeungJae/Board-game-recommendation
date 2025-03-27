@@ -2,7 +2,7 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.dates import ArchiveIndexView, YearArchiveView,MonthArchiveView
 from django.views.generic.dates import DayArchiveView, TodayArchiveView
 
-from list.models import Boardgame, Boardgame_detail
+from list.models import Boardgame, Boardgame_detail, Rating
 from django.conf import settings
 from django.views.generic import FormView
 from django.db.models import Q
@@ -27,7 +27,7 @@ import torch.nn.functional as F
 
 import random
 
-'''
+
 class NCF(nn.Module):
     def __init__(self, num_users, num_items, embedding_dim, hidden_layers):
         super(NCF, self).__init__()
@@ -73,10 +73,9 @@ class NCF(nn.Module):
 
         return prediction.squeeze()
 
-model = NCF(351048,18984,20,[64,32])
+NCF_model = NCF(351048,18984,20,[64,32])
 model_load_path = os.path.join(settings.MEDIA_ROOT, 'models', 'ncf_model.pth')
-model.load_state_dict(torch.load(model_load_path,map_location=torch.device('cpu')))
-'''
+NCF_model.load_state_dict(torch.load(model_load_path,map_location=torch.device('cpu')))
 
 class BoardgameLV(ListView):
     model=Boardgame
@@ -100,6 +99,48 @@ mapping_table_path = os.path.join(settings.MEDIA_ROOT, 'npys', 'map.npy')
 mapping_table = np.load(mapping_table_path, allow_pickle=True)
 mapping_table = pd.DataFrame(mapping_table)
 
+def recommend_for_new_user(user_ratings, top_k=10):
+
+    gmf_item_embedding = NCF_model.item_embedding_gmf.weight.detach().cpu().numpy()
+    mlp_item_embedding = NCF_model.item_embedding_mlp.weight.detach().cpu().numpy()
+    item_embeddings = np.concatenate((gmf_item_embedding, mlp_item_embedding), axis=1)
+
+    profile_vectors = []
+    scores = []
+
+
+    for db_index, rating in user_ratings:
+        model_index = mapping_table[mapping_table.iloc[:,0] == db_index][1].iloc[0]
+        profile_vectors.append(item_embeddings[model_index])
+        scores.append(rating)
+
+    if not profile_vectors:
+        return []
+
+    profile_vector = np.average(profile_vectors, axis=0, weights=scores)
+
+    profile_norm = np.linalg.norm(profile_vector)
+    item_norms = np.linalg.norm(item_embeddings, axis=1)
+    dot_products = np.dot(item_embeddings, profile_vector)
+    similarities = dot_products / (item_norms * profile_norm + 1e-8)
+
+    rated_model_indices = [mapping_table[mapping_table.iloc[:,0] == db][1].iloc[0]
+                           for db, _ in user_ratings]
+
+    top_indices = np.argsort(-similarities)[-top_k:]
+    recommendation = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in top_indices]
+    '''
+    top_recommendations = []
+    for idx in top_indices:
+        if idx not in rated_model_indices:
+            db_idx = mapping_table[mapping_table.iloc[1] == idx][0].values[0]
+            top_recommendations.append(db_idx)
+        if len(top_recommendations) >= top_k:
+            break
+    '''
+
+    return recommendation
+
 class BoardgameDV(DetailView):
     model = Boardgame_detail
     template_name = 'list/post_detail.html'
@@ -119,6 +160,23 @@ class BoardgameDV(DetailView):
 
         context['content_recommendations'] = Boardgame_detail.objects.filter(index__in=content_recommendations)
         context['collaborative_recommendations'] = Boardgame_detail.objects.filter(index__in=collaborative_recommendations)
+        rating_choices = list(range(10, 0, -1))  # 10점부터 1점까지
+
+        context['rating_choices'] = rating_choices
+
+
+            # 유저가 이미 평점 남겼는지 확인
+        if self.request.user.is_authenticated:
+            try:
+                existing_rating = Rating.objects.get(user=self.request.user, boardgame=self.object)
+                context['user_rating'] = float(existing_rating.rating)
+            except Rating.DoesNotExist:
+                context['user_rating'] = None
+            personalized_ids = self.get_personalized_recommendation(self.request.user)
+            context['personalized_recommendations'] = Boardgame_detail.objects.filter(index__in=personalized_ids)
+        else:
+            context['user_rating'] = None
+            context['personalized_recommendations'] = []
 
         return context
 
@@ -163,6 +221,21 @@ class BoardgameDV(DetailView):
         recommendation = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in top_k_indices]
 
         return recommendation
+
+
+    def get_personalized_recommendation(self, user, top_k=10):
+        user_ratings = Rating.objects.filter(user=user)
+
+        rating_list = [(r.boardgame.index, r.rating) for r in user_ratings]
+        if not rating_list:
+            return []
+
+        recommended_ids = recommend_for_new_user(
+            user_ratings=rating_list,
+            top_k=top_k
+        )
+        return recommended_ids
+
 
     def get_random_recommendation(self, k=10):
         total_games = Boardgame_detail.objects.all().values_list('index', flat=True)
@@ -216,3 +289,21 @@ def boardgame_search(request):
         'boardgames': page_obj,
         'query_params': query_params.urlencode()
     })
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Boardgame_detail, Rating
+
+@login_required
+def rate_boardgame(request, boardgame_id):
+    if request.method == 'POST':
+        rating_value = float(request.POST.get('rating'))
+        boardgame = get_object_or_404(Boardgame_detail, index=boardgame_id)
+
+        # 기존 평가가 있으면 업데이트, 없으면 새로 생성
+        rating, created = Rating.objects.update_or_create(
+            user=request.user,
+            boardgame=boardgame,
+            defaults={'rating': rating_value}
+        )
+    return redirect(boardgame.get_absolute_url())
