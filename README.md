@@ -52,6 +52,9 @@ Django 프레임워크를 활용하여 구현하였다. 저장소의 django_web 
 
 실제 구현은 저장소의 project/save_similarity.py에서 확인할 수 있다.
 
+## 시연 동영상
+
+https://www.youtube.com/watch?v=NT76vIyWupg
 
 ## license
 본 리포지토리에 사용된 데이터의 저작권은 모두 BoardGameGeeks에 있습니다. 자세한 사항은 LICENSE.md 파일을 참고하시기 바랍니다.
