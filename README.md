@@ -48,7 +48,8 @@ Django 프레임워크를 활용하여 구현하였다. 저장소의 django_web 
 ## 추천 알고리즘
 
 - **콘텐츠 기반 필터링**: 보드게임의 플레이타임, 적정 인원, 카테고리 등과 같은 특성 정보를 벡터화하고 코사인 유사도를 계산하여 다른 보드게임을 추천.
-- **아이템 기반 협업 필터링**: 사용자 평가 정보를 기반으로 아이템 간 유사도를 계산하여 추천. 행렬분해를 사용하는 memory-based aproach와 Neural Colaborrative Filtering 기법을 활용하는 model-based aproach 모두 구현되어 있다. django 프로젝트의 list/views.py에서 어떤 알고리즘을 이용해 웹서버를 실행할지 선택할 수 있다.
+- **협업 필터링**: 사용자 평가 정보를 기반으로 아이템 간 유사도를 계산하여 추천. 행렬분해를 사용하는 memory-based approach와 Neural Colaborrative Filtering 기법을 활용하는 model-based approach 모두 구현되어 있다. NCF를 활용하는 model-based approach의 경우, 사용자가 웹사이트에 로그인하여 각 보드게임들에 평점을 남긴 데이터를 기반으로 유저 맞춤형 추천 서비스를 제공한다.
+
 
 실제 구현은 저장소의 project/save_similarity.py에서 확인할 수 있다.
 
