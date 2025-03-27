@@ -111,6 +111,7 @@ def recommend_for_new_user(user_ratings, top_k=10):
 
     for db_index, rating in user_ratings:
         model_index = mapping_table[mapping_table.iloc[:,0] == db_index][1].iloc[0]
+        print(model_index)
         profile_vectors.append(item_embeddings[model_index])
         scores.append(rating)
 
@@ -127,7 +128,8 @@ def recommend_for_new_user(user_ratings, top_k=10):
     rated_model_indices = [mapping_table[mapping_table.iloc[:,0] == db][1].iloc[0]
                            for db, _ in user_ratings]
 
-    top_indices = np.argsort(-similarities)[-top_k:]
+    top_indices = np.argsort(-similarities)[:top_k]
+    print(top_indices)
     recommendation = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in top_indices]
     '''
     top_recommendations = []
@@ -216,7 +218,6 @@ class BoardgameDV(DetailView):
 
         similar_idx = ncf_corr_matrix[target_idx]
         top_k_indices = [item[0] for item in similar_idx[:k]]
-        print(top_k_indices)
 
         recommendation = [mapping_table[mapping_table.iloc[:,1] == i][0].iloc[0] for i in top_k_indices]
 

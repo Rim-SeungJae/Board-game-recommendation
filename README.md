@@ -52,8 +52,8 @@ Django 프레임워크를 활용하여 구현하였다. 저장소의 django_web 
 - **협업 필터링**: 사용자 평가 정보를 기반으로 아이템 간 유사도를 계산하여 추천. 행렬분해를 사용하는 memory-based approach와 Neural Colaborrative Filtering 모델 활용하는 model-based approach 모두 구현되어 있다. 사용자가 웹사이트에 로그인하여 평가한 보드게임들의 임베딩 벡터를 가중 평균하여 사용자 프로필 벡터를 만들고, 이 벡터와 전체 보드게임 임베딩 간의 코사인 유사도를 계산하여, 가장 유사한 보드게임들을 추천한다.
 ![Image](https://github.com/user-attachments/assets/64ec7dcc-654e-4543-a038-1e98d6345358)
 아이템 기반 협업 필터링을 활용한 추천 결과를 보여주는 웹사이트의 일부분을 캡쳐한 모습.
-![Image](https://github.com/user-attachments/assets/1f655feb-34a4-4235-8224-c394c77071e0)
-NCF 모델을 활용해 사용자 맞춤 추천 결과를 보여주는 웹사이트의 일부분을 캡쳐한 모습. 참고로 위 사진은 보드게임 'Pandemic'에 10점을 준 사용자에게 제공되는 추천 결과이다.
+![Image](https://github.com/user-attachments/assets/33848f66-3fbe-48ca-95c1-a0cbfb2a2310)
+NCF 모델을 활용해 사용자 맞춤 추천 결과를 보여주는 웹사이트의 일부분을 캡쳐한 모습. 참고로 위 사진은 보드게임 'Pandemic', 'Carcassonne', 'Catan'에 10점을 준 사용자에게 제공되는 추천 결과이다.
 - 아래는 NCF를 활용해 사용자 맞춤형 추천을 제공하는 과정을 시각화 한 내용이다.
 ![Image](https://github.com/user-attachments/assets/d4ad5611-cb2b-4baf-b717-85d75bbafd17)
 
