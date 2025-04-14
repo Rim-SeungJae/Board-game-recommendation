@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.decomposition import TruncatedSVD
 from scipy import sparse
+from scipy.sparse import csr_matrix
 from tqdm import tqdm
 import dask.dataframe as dd
 import dask.array as da
@@ -140,45 +141,44 @@ def save_corr_matrix():
     # input:
     # output: saves correlation matrix to corr_matrix.npy
     ################################################
-    bg_rating = pd.read_csv('./archive/bgg-15m-reviews.csv')
+    bg_rating = pd.read_csv('C:/Users/dipreez/Desktop/졸작/Board-game-recommendation/project/archive/bgg-15m-reviews.csv')
 
-    # drop rows(due to memory lacking issue)
-    bg_rating = bg_rating[:-int(bg_rating.shape[0]/4)]
+    # Drop a portion of the data to reduce memory usage (optional)
+    # bg_rating = bg_rating[:-int(bg_rating.shape[0] / 4)]
 
+    # Drop unused columns
     bg_rating.drop('comment', axis=1, inplace=True)
 
-    chunk_size = 500000
-    chunks = [x for x in range(0, bg_rating.shape[0], chunk_size)]
-    chunks.append(bg_rating.shape[0])
-    bg_rating_pivot = pd.DataFrame(dtype=np.float16)
-    for i in tqdm(range(0, len(chunks)-1)):
-        bg_rating_chunk = bg_rating.iloc[chunks[i]:chunks[i+1] - 1]
-        pivot_chunk = (bg_rating_chunk.groupby(['user', 'name'])['rating']
-                       .sum()
-                       .unstack()
-                       .reset_index()
-                       .set_index('user')
-                       )
-        pivot_chunk = pivot_chunk.astype(np.float16)
-        bg_rating_pivot = bg_rating_pivot.append(pivot_chunk, sort=False)
-        # if bg_rating_pivot.empty:
-        #     bg_rating_pivot = bg_rating_pivot.append(pivot_chunk, sort=False)
-        # else:
-        #     bg_rating_pivot = pd.merge(bg_rating_pivot, pivot_chunk, on='user', how='outer')
-        bg_rating_pivot = bg_rating_pivot.groupby('user').sum().reset_index().set_index('user')
-        # print(np.nonzero(bg_rating_pivot.columns.duplicated()))
+    # Pivot: user × game matrix (sparse)
+    user_item_matrix = (
+        bg_rating
+        .groupby(['user', 'name'])['rating']
+        .mean()  # or sum(), depending on your design
+        .unstack()
+    )
 
-    # bg_rating_sparse = sparse.csr_matrix(bg_rating_pivot.fillna(0).to_numpy())
-    bg_user_matrix = bg_rating_pivot.T
-    SVD = TruncatedSVD(n_components=20)
-    corrcoef_matrix = SVD.fit_transform(bg_user_matrix)
-    corr_matrix = np.corrcoef(corrcoef_matrix)
+    # Fill NaNs with 0 (assume unrated == 0)
+    user_item_matrix = user_item_matrix.fillna(0)
 
-    title = bg_rating_pivot.columns
-    title_array = np.array(list(title))
-
-    np.save('corr_matrix.npy', corr_matrix)
+    # Save titles (column order = game names)
+    title_array = np.array(list(user_item_matrix.columns))
     np.save('bg_titles.npy', title_array)
+
+    # Transpose to get item × user matrix
+    item_user_matrix = user_item_matrix.T
+
+    # Convert to sparse matrix
+    sparse_matrix = csr_matrix(item_user_matrix.values)
+
+    # Truncated SVD
+    svd = TruncatedSVD(n_components=20, random_state=42)
+    svd_matrix = svd.fit_transform(sparse_matrix)
+
+    # Correlation matrix based on reduced vectors
+    corr_matrix = np.corrcoef(svd_matrix)
+
+    # Save to disk
+    np.save('corr_matrix.npy', corr_matrix)
 
 def save_top_k_from_existing_corr_matrix(npy_file_path, k=10, output_file_path='top_k_corr_matrix.npy'):
     ################################################
@@ -255,6 +255,6 @@ def save_ncf_top_k_similarity(k=10, save_path="ncf_top_k_similarity.npy"):
 
 
 if __name__ == '__main__':
-    save_content_based_similarity()
-    #save_corr_matrix()
+    # save_content_based_similarity()
+    save_corr_matrix()
     # save_top_k_from_existing_corr_matrix('C:/Users/dipreez/Desktop/졸작/Board-game-recommendation/project/corr_matrix.npy', k=10)

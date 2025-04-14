@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% load static %}
 
@@ -10,15 +10,27 @@
 {% endblock %}
 
 {% block content %}
-	<div class="home-image">
-	</div>
+<div class="home-image">
+</div>
+<div class="container mt-5">
+  <h2 class="mt-5 mb-4">⭐ 인기 보드게임 TOP 6</h2>
+  <div class="row">
+    {% for game in popular_games %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <img src="{{ game.thumbnail }}" class="card-img-top" alt="{{ game.primary }}" style="height:200px; object-fit:cover;">
+          <div class="card-body">
+            <h5 class="card-title">{{ game.primary }}</h5>
+            <p class="card-text">평균 평점: {{ game.average }}</p>
+            <a href="{{ game.get_absolute_url }}" class="btn btn-sm btn-outline-secondary">보러가기</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 
-	<hr style="margin: 10px 0;">
-
-	<div class="row">
-		<div class="col-sm-6">
-			<h3>이 다음엔 뭐하지?</h3>
-			<p>보드게임 카페에서 게임을 고르는데만 한참 고민하는 당신을 위한 웹사이트</p>
-		</div>
-	</div>
-{% endblock content %}
+  <div class="text-center mt-5">
+    <a href="{% url 'list:boardgame_search' %}" class="btn btn-lg btn-success">🔍 보드게임 검색하러 가기</a>
+  </div>
+</div>
+{% endblock %}
