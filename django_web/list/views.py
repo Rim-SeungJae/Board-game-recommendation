@@ -73,7 +73,7 @@ class NCF(nn.Module):
 
         return prediction.squeeze()
 
-NCF_model = NCF(351048,18984,20,[64,32])
+NCF_model = NCF(351048,18984,10,[32,16])
 model_load_path = os.path.join(settings.MEDIA_ROOT, 'models', 'ncf_model.pth')
 NCF_model.load_state_dict(torch.load(model_load_path,map_location=torch.device('cpu')))
 
